@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<style>
+		.a {
+			color: red;
+		}
+		.b {
+			color: green;
+		}
+		h1 {
+			background-color: #ddd;
+		}
+		input {
+			border: solid 1px skyblue;
+			border-radius: 5px;
+			height: 20px;
+			margin: 5px;
+			padding-left: 5px;
+		}
+		button {
+			background-color: #fff;
+			border: solid 1px skyblue;
+		}
+	</style>
+	<body>
+		<div id="app">
+			<h1>1.双向数据绑定</h1>
+			<input type="text" v-model="name"/>
+			<p>你好{{name}}</p>
+			
+			<h1>2.带标签的数据</h1>
+			<p v-html="age"></p>
+			
+			<h1>3.事件绑定</h1>
+			<button @click="text">button</button><br />
+			<button @click="text2">button2</button><br />
+			
+			<h1>4.计算属性与监视</h1>
+			姓：<input type="text" v-model="firstname"/><br />
+			名：<input type="text" v-model="lastname" /><br />
+			姓名1(计算属性)：<input type="text" v-model="fullname1"/><br />
+			姓名2(监视)：<input type="text" v-model="fullname2" /><br />
+			姓名3(双向)：<input type="text" v-model="fullname3" /><br />
+			
+			<h1>5.class与style的绑定</h1>
+			<p :class="isShow?'a':'b'">class的切换</p>
+			<p :class="{a:isShow}">class是否添加</p>
+			<button @click="changeColor()">切换</button>
+			<p :style="styles">style添加</p>
+			
+			<h1>6.条件渲染</h1>
+			<template v-if="isShow1">
+				<p>我是if</p>
+				<p>我是一组dom</p>
+			</template>
+			<template v-else>
+				<p>我是else</p>
+				<p>我也是一组dom</p>
+			</template>
+			<button @click="if_else()">创建哪个</button>
+			
+			<h1>7.列表渲染</h1>
+			<ul>
+				<li v-for="(data,index) in students" :key="index">
+					{{index}}......{{data.name}}_{{data.age}}
+				</li>
+			</ul>
+			按名称查询：<input type="text" v-model="searchName"/>
+			<ul>
+				<li v-for="(data,index) in fstudents" :key="index">
+					{{index}}......{{data.name}}_{{data.age}}
+				</li>
+			</ul>
+			
+			<h1>8.生命周期图示</h1>
+			<a href="https://cn.vuejs.org/v2/guide/instance.html#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%9B%BE%E7%A4%BA" target="_blank">图示</a>
+			
+			<h1>9.表单控件绑定</h1>
+			<p>请选择性别：</p>
+			<input type="radio" name="sex" value="male" v-model="Sex"/>男
+			<input type="radio" name="sex" value="female" v-model="Sex"/>女
+			<p>请选择爱好：</p>
+			<input type="checkbox" name="hobby" value="sing" v-model="Hobby"/>唱
+			<input type="checkbox" name="hobby" value="dance" v-model="Hobby"/>跳
+			<input type="checkbox" name="hobby" value="rap" v-model="Hobby"/>说唱
+			<input type="checkbox" name="hobby" value="basketball" v-model="Hobby"/>篮球
+			<input type="checkbox" name="hobby" value="swim" v-model="Hobby"/>游泳
+			<input type="checkbox" name="hobby" value="badminton" v-model="Hobby"/>羽毛球
+			<p>我的性别是：{{Sex}}</p>
+			<p>我的爱好是：{{Hobby}}</p>
+			
+			<h1>10.组件使用</h1>
+			<child></child>
+			
+			<h1>11.父子组件交流</h1>
+			<p>父传子</p>
+			<child2 :fullname2='fullname2'></child2>
+			
+		</div>
+		
+		<script type="text/javascript" src="../js/vue.js"></script>
+		<script type="text/javascript">
+			var vm = new Vue({
+				el:'#app',
+				data:{
+					name:'hello',
+					age:'<i>20</i>',
+					Sex:'?',
+					firstname:'han',
+					lastname:'xiao',
+					fullname2:'han xiao',
+					Hobby:[],
+					isShow:true,
+					styles:{
+						fontSize:'30px',
+						color:'blue',
+					},
+					isShow1:true,
+					students:[
+						{name:'Tom',age:18},
+						{name:'Jake',age:20},
+						{name:'Bob',age:16},
+						{name:'Rose',age:19}
+					],
+					searchName:'',
+				},
+				methods:{
+					text(){
+						alert("hehe");
+					},
+					text2(e){
+						alert(e.target.innerHTML);
+					},
+					changeColor(){
+						this.isShow = !this.isShow;
+					},
+					if_else(){
+						this.isShow1 = !this.isShow1;
+					}
+				},
+				computed:{
+					fullname1(){
+						return this.firstname + ' ' + this.lastname;
+					},
+					fullname3:{
+						get(){
+							return this.firstname + ' ' + this.lastname;
+						},
+						set(value){
+							var arry = value.split(' ');
+							this.firstname = arry[0];
+							this.lastname = arry[1];
+						}
+					},
+					
+					fstudents(){
+						var f;
+						f = this.students.filter(p => p.name.indexOf(this.searchName)!==-1);
+						return f;
+					}
+				},
+				watch:{
+					firstname:function(value){
+						this.fullname2 = value + ' ' + this.lastname;
+					},
+					lastname:function(value){
+						this.fullname2 = this.firstname + ' ' + value;
+					}
+				},
+				components:{
+					'child':{
+						template:`
+							<div>
+								<hr>
+								<div>this is a component</div>
+								<p>{{text}}</p>
+								<button>no use hhh</button>
+								<hr>
+							</div>
+						`,
+						data:function(){
+							return{
+								text:'data 写在函数里',
+							}
+						},
+					},
+					'child2':{
+						template:`
+							<div>
+								<p>父组件传来的fullname2:{{fullname2}}</p>
+							</div>
+						`,
+						props:['fullname2']
+					},
+					
+				}
+			})
+		</script>
+	</body>
+</html>
